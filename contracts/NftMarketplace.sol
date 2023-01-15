@@ -31,11 +31,7 @@ contract NftMarketplace is ReentrancyGuard {
         uint256 price
     );
 
-    event ItemCanceled(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 tokenId
-    );
+    event ItemCanceled(address indexed seller, address indexed nftAddress, uint256 tokenId);
 
     // NFT Contract address -> NFT TokenID -> Listing
     mapping(address => mapping(uint256 => Listing)) private s_listings;
@@ -135,5 +131,14 @@ contract NftMarketplace is ReentrancyGuard {
     {
         delete (s_listings[nftAddress][tokenId]);
         emit ItemCanceled(msg.sender, nftAddress, tokenId);
+    }
+
+    function updateListing(
+        address nftAddress,
+        uint256 tokenId,
+        uint256 newPrice
+    ) external isListed(nftAddress, tokenId) isOwner(nftAddress, tokenId, msg.sender) {
+        s_listings[nftAddress][tokenId].price = newPrice;
+        emit ItemListed(msg.sender, nftAddress, tokenId, newPrice);
     }
 }
